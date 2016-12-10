@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">DemMaze</string>
+    <string name="btn_newgame">New Game</string>
+    <string name="btn_exit">Exit</string>
+</resources>
