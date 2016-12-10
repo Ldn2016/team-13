@@ -69,12 +69,28 @@ public class Maze implements Serializable {
         this.horizontalLines = horizontalLines;
     }
 
+    public boolean[][] getVerticalLines() {
+        return verticalLines;
+    }
+
+    public boolean[][] getHorizontalLines() {
+        return horizontalLines;
+    }
+
     public int getSizeX() {
         return sizeX;
     }
 
     public int getSizeY() {
         return sizeY;
+    }
+
+    public int getCurrentX() {
+        return currentX;
+    }
+
+    public int getCurrentY() {
+        return currentY;
     }
 
     public void setSizeY(int sizeY) {
