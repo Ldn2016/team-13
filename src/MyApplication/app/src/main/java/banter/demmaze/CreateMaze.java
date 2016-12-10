@@ -3,6 +3,10 @@ package banter.demmaze;
 public class CreateMaze {
 
     public static Maze getMaze(int mazeNo) {
+        if (mazeNo < 1) {
+            System.err.println("Can't have a negative maze number");
+            System.exit(1);
+        }
         Maze maze = null;
         if(mazeNo == 1) {
             maze = new Maze();
