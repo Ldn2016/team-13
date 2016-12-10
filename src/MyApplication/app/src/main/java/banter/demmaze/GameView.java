@@ -5,9 +5,14 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.util.Log;
+import android.view.GestureDetector;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
+
+import static android.view.GestureDetector.*;
 
 public class GameView extends View {
 
@@ -19,6 +24,12 @@ public class GameView extends View {
     private Maze maze;
     private Activity context;
     private Paint line, red, background;
+
+    private static final int SWIPE_MIN_DISTANCE = 60;
+    private static final int SWIPE_MAX_OFF_PATH = 250;
+    private static final int SWIPE_THRESHOLD_VELOCITY = 100;
+    private GestureDetector gestureDetector;
+    private View.OnTouchListener gestureListener;
 
     public GameView(Context context, Maze maze) {
         super(context);
@@ -36,6 +47,15 @@ public class GameView extends View {
         this.background.setColor(getResources().getColor(R.color.game_bg, context.getTheme()));
         this.setFocusable(true);
         this.setFocusableInTouchMode(true);
+
+        gestureDetector = new GestureDetector(context, new MyGestureDetector());
+        gestureListener = new View.OnTouchListener() {
+            public boolean onTouch(View v, MotionEvent event) {
+                Log.i("onTouch", "it goes into onTouch");
+                return gestureDetector.onTouchEvent(event);
+            }
+        };
+        this.setOnTouchListener(gestureListener);
     }
 
     @Override
@@ -44,7 +64,7 @@ public class GameView extends View {
         // square mazes
         height = width;
         lineWidth = 2;
-        cellWidth = (width - ((float)mazeSizeX*lineWidth)) / mazeSizeX;
+        cellWidth = (width - ((float) mazeSizeX*lineWidth)) / mazeSizeX;
         totalCellWidth = cellWidth+lineWidth;
         cellHeight = (height - ((float)mazeSizeY*lineWidth)) / mazeSizeY;
         totalCellHeight = cellHeight+lineWidth;
@@ -95,49 +115,70 @@ public class GameView extends View {
                 red);
     }
 
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent evt) {
-        boolean moved;
-        switch(keyCode) {
-            case KeyEvent.KEYCODE_DPAD_UP:
-                moved = maze.move(Maze.UP);
-                break;
-            case KeyEvent.KEYCODE_DPAD_DOWN:
-                moved = maze.move(Maze.DOWN);
-                break;
-            case KeyEvent.KEYCODE_DPAD_RIGHT:
-                moved = maze.move(Maze.RIGHT);
-                break;
-            case KeyEvent.KEYCODE_DPAD_LEFT:
-                moved = maze.move(Maze.LEFT);
-                break;
-            default:
-                return super.onKeyDown(keyCode,evt);
+    private class MyGestureDetector extends SimpleOnGestureListener {
+
+        public boolean onTouchEvent(MotionEvent e) {
+            Log.i("onTouchEvent", e.toString());
+            return true;
         }
-        if(moved) {
-            //the ball was moved so we'll redraw the view
-            invalidate();
-            if(maze.isGameComplete()) {
-                //game completed
-                AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                builder.setTitle(context.getText(R.string.finished_title));
-                LayoutInflater inflater = context.getLayoutInflater();
-                View view = inflater.inflate(R.layout.finish, null);
-                builder.setView(view);
-                View closeButton =view.findViewById(R.id.closeGame);
-                closeButton.setOnClickListener(new OnClickListener() {
-                    @Override
-                    public void onClick(View clicked) {
-                        if(clicked.getId() == R.id.closeGame) {
-                            context.finish();
-                        }
+
+        @Override
+        public boolean onDown(MotionEvent e) {
+            Log.i("onDown", "down");
+            return super.onDown(e);
+        }
+
+        @Override
+        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+            boolean moved = false;
+            Log.i("fling", "goes into fling");
+
+            try {
+                if (Math.abs(e1.getY() - e2.getY()) > SWIPE_MAX_OFF_PATH)
+                    return false;
+                // right to left swipe
+                if (e1.getX() - e2.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
+                    // left swipe
+                    Log.i("onFling", "left");
+                    maze.move(maze.LEFT);
+                    moved = true;
+                } else if (e2.getX() - e1.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
+                    // right swipe
+                    Log.i("onFling", "right");
+                    maze.move(maze.RIGHT);
+                    moved = true;
+                }
+
+                if(moved) {
+                    //the ball was moved so we'll redraw the view
+                    invalidate();
+                    if(maze.isGameComplete()) {
+                        //game completed
+                        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                        builder.setTitle(context.getText(R.string.finished_title));
+                        LayoutInflater inflater = context.getLayoutInflater();
+                        View view = inflater.inflate(R.layout.finish, null);
+                        builder.setView(view);
+                        View closeButton =view.findViewById(R.id.closeGame);
+                        closeButton.setOnClickListener(new OnClickListener() {
+                            @Override
+                            public void onClick(View clicked) {
+                                if(clicked.getId() == R.id.closeGame) {
+                                    context.finish();
+                                }
+                            }
+                        });
+                        AlertDialog finishDialog = builder.create();
+                        finishDialog.show();
                     }
-                });
-                AlertDialog finishDialog = builder.create();
-                finishDialog.show();
+                }
+
+            } catch (Exception e) {
+                // nothing
+                System.err.println("Hopefully it never gets here");
             }
+            return false;
         }
-        return true;
     }
 
 }
