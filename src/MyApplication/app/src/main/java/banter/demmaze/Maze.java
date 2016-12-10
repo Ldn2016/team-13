@@ -6,16 +6,14 @@ public class Maze implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    public static final int UP = 0, DOWN = 1, RIGHT = 2, LEFT = 3;
-
+    // could have used an enum here
+    protected static final int UP = 0, DOWN = 1, RIGHT = 2, LEFT = 3;
     private boolean[][] verticalLines;
     private boolean[][] horizontalLines;
     private int sizeX, sizeY;         //stores the width and height of the maze
     private int currentX, currentY;   //stores the current location of the ball
     private int finalX, finalY;       //stores the finishing point of the maze
     private boolean gameComplete;
-
-    //setters and getters
 
     public boolean move(int direction) {
         boolean moved = false;
@@ -103,10 +101,6 @@ public class Maze implements Serializable {
 
     public boolean isGameComplete() {
         return gameComplete;
-    }
-
-    public void setGameComplete(boolean gameComplete) {
-        this.gameComplete = gameComplete;
     }
 
     public int getFinalX() {

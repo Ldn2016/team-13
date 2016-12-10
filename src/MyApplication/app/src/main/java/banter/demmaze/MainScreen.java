@@ -33,9 +33,12 @@ public class MainScreen extends AppCompatActivity implements View.OnClickListene
                 builder.setTitle("Select a Maze");
                 builder.setItems(levels, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int item) {
-                        Intent game = new Intent(MainScreen.this, Game.class);  //create an Intent to launch the Game Activity
-                        Maze maze = CreateMaze.getMaze(item+1);         //use helper class for creating the Maze
-                        game.putExtra("maze", maze);                     //add the maze to the intent which we'll retrieve in the Maze Activity
+                        //create an Intent to launch the Game Activity
+                        Intent game = new Intent(MainScreen.this, Game.class);
+                        //use helper class for creating the Maze
+                        Maze maze = CreateMaze.getMaze(item+1);
+                        //add the maze to the intent which we'll retrieve in the Maze Activity
+                        game.putExtra("maze", maze);
                         startActivity(game);
                     }
                 });

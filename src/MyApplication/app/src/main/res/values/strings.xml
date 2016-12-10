@@ -2,6 +2,7 @@
     <string name="app_name">DemMaze</string>
     <string name="btn_newgame">New Game</string>
     <string name="btn_exit">Exit</string>
+    <string name="btn_left">Left</string>
     <string name="finished_title">Congrats</string>
     <string name="finished_text">Level Cleared</string>
     <string name="finished_button">End Game</string>

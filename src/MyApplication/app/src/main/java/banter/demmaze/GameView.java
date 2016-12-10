@@ -13,8 +13,8 @@ public class GameView extends View {
 
     private int width, height, lineWidth;
     private int mazeSizeX, mazeSizeY;
-    float cellWidth, cellHeight;
-    float totalCellWidth, totalCellHeight;
+    private float cellWidth, cellHeight;
+    private float totalCellWidth, totalCellHeight;
     private int mazeFinishX, mazeFinishY;
     private Maze maze;
     private Activity context;
@@ -24,24 +24,26 @@ public class GameView extends View {
         super(context);
         this.context = (Activity)context;
         this.maze = maze;
-        mazeFinishX = maze.getFinalX();
-        mazeFinishY = maze.getFinalY();
-        mazeSizeX = maze.getSizeX();
-        mazeSizeY = maze.getSizeY();
-        line = new Paint();
-        line.setColor(getResources().getColor(R.color.colorPrimary));
-        red = new Paint();
-        red.setColor(getResources().getColor(R.color.colorPrimary));
-        background = new Paint();
-        background.setColor(getResources().getColor(R.color.colorAccent));
-        setFocusable(true);
+        this.mazeFinishX = maze.getFinalX();
+        this.mazeFinishY = maze.getFinalY();
+        this.mazeSizeX = maze.getSizeX();
+        this.mazeSizeY = maze.getSizeY();
+        this.line = new Paint();
+        this.line.setColor(getResources().getColor(R.color.line, context.getTheme()));
+        this.red = new Paint();
+        this.red.setColor(getResources().getColor(R.color.position, context.getTheme()));
+        this.background = new Paint();
+        this.background.setColor(getResources().getColor(R.color.game_bg, context.getTheme()));
+        this.setFocusable(true);
         this.setFocusableInTouchMode(true);
     }
 
+    @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-        width = (w < h)?w:h;   //check whether the width or height of the screen is smaller
-        height = width;         //for now square mazes
-        lineWidth = 1;          //for now 1 pixel wide walls
+        width = (w < h)?w:h;
+        // square mazes
+        height = width;
+        lineWidth = 2;
         cellWidth = (width - ((float)mazeSizeX*lineWidth)) / mazeSizeX;
         totalCellWidth = cellWidth+lineWidth;
         cellHeight = (height - ((float)mazeSizeY*lineWidth)) / mazeSizeY;
@@ -95,7 +97,7 @@ public class GameView extends View {
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent evt) {
-        boolean moved = false;
+        boolean moved;
         switch(keyCode) {
             case KeyEvent.KEYCODE_DPAD_UP:
                 moved = maze.move(Maze.UP);
